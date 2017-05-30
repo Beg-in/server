@@ -1,0 +1,6 @@
+.npmignore
+.eslintrc.js
+.circle.yml
+docs.hbs
+test
+coverage
