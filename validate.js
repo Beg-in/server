@@ -157,7 +157,7 @@ module.exports = Object.assign(obj => {
    * Validation type requiring nothing at all
    * @constant
    */
-  nullable: Object.assign(() => {}, { test: () => true }),
+  nullable: Object.assign(value => typeof value === 'string' ? value.trim() : value, { test: () => true }),
 
   // TODO: Numbers and ranges
   // TODO: Dates and ranges
