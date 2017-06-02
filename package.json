@@ -1,6 +1,6 @@
 {
   "name": "api-organizer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node.js server-side organizational pattern",
   "engines": {
     "node": ">=7.6"
