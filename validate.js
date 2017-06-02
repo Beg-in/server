@@ -1,39 +1,44 @@
 'use strict';
 
-let optional = fn => value => {
+let error = require('./error');
+let util = require('./util');
+
+let optional = (fn, out) => value => {
   if (value === undefined) {
-    return true;
+    return out;
   }
   return fn(value);
 };
 
-let ValidationError = class extends Error {};
+let ValidationError = class extends error.Error {
+  constructor(message, status = error.ERROR_CODES.badRequest.status) {
+    super(message, status);
+  }
+};
 
-let required = (fn, message) => value => {
+let required = (fn, message, status) => value => {
   if (value === undefined) {
     if (message) {
-      throw new ValidationError(message);
+      throw new ValidationError(message, status);
     }
     return false;
   }
   return fn(value);
 };
 
-let rule = (regex, message) => {
-  let test = value => regex.test(value);
+let rule = (fn, message, status) => {
+  let test = value => util.isRegex(fn) ? fn.test(value) : fn(value);
   let trial = value => {
     if (!test(`${value}`.trim())) {
-      throw new ValidationError(message);
+      throw new ValidationError(message, status);
     }
-    return typeof value === 'string' ? value.trim() : value;
+    return util.isString(value) ? value.trim() : value;
   };
   return Object.assign(optional(trial), {
-    test: optional(test),
-    pattern: regex,
+    test: optional(test, true),
     message,
-    required: Object.assign(required(trial, message), {
-      test: required(test),
-      pattern: regex,
+    required: Object.assign(required(trial, message, status), {
+      test: required(test, message, status),
       message,
     }),
   });
@@ -67,7 +72,7 @@ module.exports = Object.assign(obj => {
     return out;
   }, {});
   return Object.assign(optional(trial), {
-    test: optional(test),
+    test: optional(test, true),
     required: Object.assign(required(trial, 'Inner object undefined'), {
       test: required(test),
     }),
@@ -153,15 +158,46 @@ module.exports = Object.assign(obj => {
     'Must be at least 8 characters long, contain at least one letter, and contain at least one number'
   ),
 
+  // TODO: have this validate types and inner objects
+  array: rule(
+    value => util.isArray(value),
+    'Must be an array',
+    error.ERROR_CODES.serverError.status
+  ),
+
+  // TODO: Match specific string
+  string: rule(
+    value => util.isString(value),
+    'Must be a string',
+    error.ERROR_CODES.serverError.status
+  ),
+
+  boolean: rule(
+    value => util.isBoolean(value),
+    'Must be a boolean',
+    error.ERROR_CODES.serverError.status
+  ),
+
+  // TODO: Ranges of numbers
+  number: rule(
+    value => util.isNumber(value),
+    'Must be a number',
+    error.ERROR_CODES.serverError.status
+  ),
+
+  integer: rule(
+    value => util.isInteger(value),
+    'Must be an integer',
+    error.ERROR_CODES.serverError.status
+  ),
+
+  // TODO: Dates and ranges
+
   /**
    * Validation type requiring nothing at all
    * @constant
    */
-  nullable: Object.assign(value => typeof value === 'string' ? value.trim() : value, { test: () => true }),
+  any: rule(() => true),
 
-  // TODO: Numbers and ranges
-  // TODO: Dates and ranges
   // TODO: One of a list
-  // TODO: Match specific string
-  // TODO: boolean
 });
