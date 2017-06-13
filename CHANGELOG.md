@@ -1,3 +1,13 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/Beg-in/api-organizer/compare/0.1.2...0.1.3) (2017-06-13)
+
+
+### Bug Fixes
+
+* **util:** handle typeof null === 'object' for isObject and add isDate ([02d7a91](https://github.com/Beg-in/api-organizer/commit/02d7a91))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/Beg-in/api-organizer/compare/0.1.1...0.1.2) (2017-06-02)
 
