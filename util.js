@@ -8,7 +8,7 @@ module.exports = {
     return arg instanceof RegExp;
   },
   isObject(arg) {
-    return typeof arg === 'object' && !Array.isArray(arg);
+    return typeof arg === 'object' && !Array.isArray(arg) && arg !== null;
   },
   isArray(arg) {
     return Array.isArray(arg);
@@ -24,5 +24,8 @@ module.exports = {
   },
   isBoolean(arg) {
     return arg === true || arg === false;
+  },
+  isDate(arg) {
+    return arg instanceof Date && !isNaN(arg.valueOf());
   },
 };

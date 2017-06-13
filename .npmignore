@@ -1,6 +1,7 @@
 .npmignore
 .eslintrc.js
-.circle.yml
+circle.yml
+yarn.lock
 docs.hbs
 test
 coverage
