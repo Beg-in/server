@@ -25,10 +25,10 @@ const METHODS = [
 //   return ctx.getProfile(ctx.req.body);
 // });
 
-// let organizer = require('api-organizer');
+// let route = require('begin-server/route');
 // let express = require('express');
 // let app = express();
-// let api = organizer(app, 'v1');
+// let api = route(app, 'v1');
 
 // api();
 // api('profile');

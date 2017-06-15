@@ -140,6 +140,8 @@ module.exports = Object.assign(obj => {
     'Must be at least two characters'
   ),
 
+  // TODO: specific length strings
+
   /**
    * Validation type requiring a valid email address
    * @constant
@@ -199,5 +201,10 @@ module.exports = Object.assign(obj => {
    */
   any: rule(() => true),
 
-  // TODO: One of a list
+  // TODO: One of a list (enums)
+  // TODO: URLs
+  // TODO: Hex color
+  // TODO: Base64 file (datauri?)
+  // TODO: Telephone number (international)
 });
+
