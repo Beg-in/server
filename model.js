@@ -5,6 +5,7 @@ let error = require('./error');
 
 const MAX_RETRIES = 5;
 const JSONB = 'data || jsonb_build_object(\'_id\', id) as data';
+const UNIQUE_VIOLATION = '23505';
 
 module.exports = db => class Model {
   constructor(obj = {}) {
@@ -66,7 +67,7 @@ module.exports = db => class Model {
         `, [this._id, JSON.stringify(this)]);
         complete = true;
       } catch (e) {
-        if (e.code !== '23505') {
+        if (e.code !== UNIQUE_VIOLATION) {
           throw e;
         }
       }

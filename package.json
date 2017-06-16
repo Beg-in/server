@@ -1,6 +1,6 @@
 {
   "name": "begin-server",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Node.js server-side organizational pattern",
   "engines": {
     "node": ">=7.6"
@@ -26,14 +26,12 @@
   "homepage": "https://github.com/Beg-in/server#readme",
   "devDependencies": {
     "ava": "^0.19.1",
+    "begin-linting": "^0.1.0",
     "commitizen": "^2.9.6",
     "conventional-changelog-cli": "^1.3.1",
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "^3.19.0",
-    "eslint-config-airbnb-base": "^11.2.0",
     "eslint-formatter-pretty": "^1.1.0",
-    "eslint-plugin-ava": "^4.2.0",
-    "eslint-plugin-import": "^2.3.0",
     "jsdoc-to-markdown": "^3.0.0"
   },
   "peerDependencies": {
