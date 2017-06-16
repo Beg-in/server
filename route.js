@@ -77,4 +77,4 @@ module.exports = (app, root) => Object.assign((base, controller) => {
     };
     return out;
   }, {});
-}, error);
+}, { error });
