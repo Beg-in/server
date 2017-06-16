@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/Beg-in/server/compare/0.2.0...0.2.1) (2017-06-16)
+
+
+### Bug Fixes
+
+* **route:** add error as route export ([be17064](https://github.com/Beg-in/server/commit/be17064))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/Beg-in/server/compare/0.1.3...0.2.0) (2017-06-16)
 
