@@ -35,13 +35,12 @@ const METHODS = [
 // api(profileController);
 // api('profile', profileController);
 
-module.exports = (app, root) => Object.assign((base, controller) => {
+module.exports = (app, root = '') => Object.assign((base, controller = {}) => {
   if (typeof base !== 'string') {
     controller = base;
     base = '';
   }
-  controller = controller || {};
-  base = path.join('/', root || '', base);
+  base = path.join('/', root, base);
   return METHODS.reduce((out, method) => {
     out[method] = (endpoint, cb) => {
       if (typeof endpoint !== 'string') {

@@ -2,7 +2,9 @@
 
 let crypto = require('crypto');
 let error = require('./error');
+let { isFunction, isString } = require('./util');
 
+const ID_SIZE = 12;
 const MAX_RETRIES = 5;
 const JSONB = 'data || jsonb_build_object(\'_id\', id) as data';
 const UNIQUE_VIOLATION = '23505';
@@ -21,17 +23,13 @@ module.exports = db => class Model {
   }
 
   static validate(obj) {
-    let id = obj._id;
-    let config = this.config();
-    let created = obj.created || config.created;
-    if (typeof config.validate === 'function') {
-      obj = config.validate(obj);
+    let { _id } = obj;
+    let { created, validate } = this.config();
+    created = (created && obj.created) || created || undefined;
+    if (isFunction(validate)) {
+      obj = validate(obj);
     }
-    obj._id = id;
-    if (config.created !== false) {
-      obj.created = created;
-    }
-    return obj;
+    return Object.assign(obj, { _id, created });
   }
 
   static async createTable() {
@@ -46,20 +44,21 @@ module.exports = db => class Model {
 
   static genId() {
     return crypto
-      .randomBytes(12)
+      .randomBytes(ID_SIZE)
       .toString('base64')
       .replace(/\//g, '_')
       .replace(/\+/g, '-');
   }
 
   async create() {
-    if (!this._id) {
-      this._id = this.constructor.genId();
-    }
+    let newId = !this._id;
     Object.assign(this, this.constructor.validate(this));
     let complete = false;
-    for (let i = 0; i <= MAX_RETRIES && !complete; i++) {
+    for (let i = 0; i <= (newId ? MAX_RETRIES : 1) && !complete; i++) {
       /* eslint-disable no-await-in-loop */
+      if (newId) {
+        this._id = this.constructor.genId();
+      }
       try {
         await db.query(`
           insert into ${this.constructor.config().table}
@@ -147,27 +146,25 @@ module.exports = db => class Model {
   static query(...args) {
     let query = db.query(...args).then(result => result.rows.map(row => row.data));
     let unique = promise => {
-      promise.unique = err => {
+      promise.unique = (err = 'Non-unique result in query') => {
         let out = promise.then(result => {
           if (result.length > 1) {
-            err = err || error.fatal('Non-unique result in query');
-            throw err;
+            throw (isString(err) ? error.fatal(err) : err);
           }
           return result[0];
         });
-        out.of = T => out.then(result => T ? new T(result) : new this(result));
+        out.of = (T = this) => out.then(result => new T(result));
         return out;
       };
     };
     unique(query);
     let listOf = promise => {
-      promise.of = T => promise.then(result => result.map(row => T ? new T(row) : new this(row)));
+      promise.of = (T = this) => promise.then(result => result.map(row => new T(row)));
     };
-    query.required = err => {
+    query.required = (err = 'No result in query') => {
       let out = query.then(result => {
         if (!result || !result.length || result.length < 1) {
-          err = err || error.notFound('No result in query');
-          throw err;
+          throw (isString(err) ? error.notFound(err) : err);
         }
         return result;
       });
@@ -177,6 +174,11 @@ module.exports = db => class Model {
     };
     unique(query);
     listOf(query);
+    query.empty = (err = 'Unexpected result in query') => query.then(result => {
+      if (result && result.length !== 0 && result.length > 0) {
+        throw (isString(err) ? error.conflict(err) : err);
+      }
+    });
     return query;
   }
 
