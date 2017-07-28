@@ -2,78 +2,93 @@
 
 let path = require('path');
 let error = require('./error');
+let { isFunction, isString } = require('./util');
 
-const METHODS = [
-  'all', 'checkout', 'copy', 'delete', 'get', 'head', 'lock', 'merge',
-  'mkactivity', 'mkcol', 'move', 'm-search', 'notify', 'options', 'patch', 'post',
-  'purge', 'put', 'report', 'search', 'subscribe', 'trace', 'unlock', 'unsubscribe',
-];
+const METHODS = ['get', 'post', 'put', 'delete'];
 
-// module.exports = {
-//   scope: {
-//     profileController,
-//   },
-//   async test() {
-//     await this.profileController.getCurrentUser();
-//   },
-// };
-
-// let router = api('profile', profileController);
-//
-// router.get('login', async ctx => {
-//   await auth.test(ctx);
-//   return ctx.getProfile(ctx.req.body);
-// });
-
-// let route = require('begin-server/route');
-// let express = require('express');
-// let app = express();
-// let api = route(app, 'v1');
-
-// api();
-// api('profile');
-// api(profileController);
-// api('profile', profileController);
-
-module.exports = (app, root = '') => Object.assign((base, controller = {}) => {
-  if (typeof base !== 'string') {
-    controller = base;
-    base = '';
+module.exports = (app, options = {}) => controller => {
+  if (!isFunction(controller.routes)) {
+    return;
   }
-  base = path.join('/', root, base);
-  return METHODS.reduce((out, method) => {
-    out[method] = (endpoint, cb) => {
-      if (typeof endpoint !== 'string') {
-        cb = endpoint;
-        endpoint = '';
-      }
-      endpoint = path.join(base, endpoint);
-      app[method](endpoint, async (req, res) => {
-        let bind = details => {
-          let bound = Object.create(details);
-          if (bound.scope) {
-            Object.entries(bound.scope).forEach(([key, value]) => {
-              bound[key] = bind(value);
-            });
-          }
-          return Object.assign(bound, { req, res });
-        };
-        try {
-          res.json(await cb(bind(controller)));
-        } catch (e) {
-          let status = e.status || 500;
-          res.status(status);
-          let apiError = { error: error.ERROR_CODES.serverError.message };
-          if (!error.isError(e) || status === 500) {
-            // TODO: support different log handler or error handler
-            console.error(e);
-          } else {
-            apiError.error = e.message;
-          }
-          res.json(apiError);
+  let {
+    root = '',
+    onError = console.error,
+    beforeEach = () => {},
+  } = options;
+  let base = root;
+  // Proxy methods in `app` with functions that take `(endpoint, callback)`
+  let api = (...apiArgs) => {
+    let set = ({ resType = 'json' } = {}) => {
+      let handler = method => (endpoint, cb) => {
+        let interceptor = beforeEach(...apiArgs);
+        if (!isString(endpoint)) {
+          cb = endpoint;
+          endpoint = '';
         }
+        endpoint = path.join(base, endpoint);
+        // register the endpoint to `app` and maintain the callback arguments
+        app[method](endpoint, async (req, res) => {
+          let bind = details => {
+            let bound = Object.create(details);
+            if (bound.scope) {
+              Object.entries(bound.scope).forEach(([key, value]) => {
+                bound[key] = bind(value);
+              });
+            }
+            return Object.assign(bound, { req, res });
+          };
+          try {
+            // first try running the beforeEach function
+            await interceptor(req, res);
+            let out = await cb(req, res)(bind(controller));
+            if (resType) {
+              res[resType](out);
+            }
+          } catch (e) {
+            let status = e.status || 500;
+            res.status(status);
+            let apiError = { error: error.ERROR_CODES.serverError.message };
+            if (!error.isError(e) || status === 500) {
+              onError(e);
+            } else {
+              apiError.error = e.message;
+            }
+            res.json(apiError);
+          }
+        });
+      };
+      return METHODS.reduce((out, method) => {
+        out[method] = handler(method);
+        return out;
+      }, {
+        other(method, ...args) {
+          return handler(method)(...args);
+        },
       });
     };
+    return Object.assign(set(), { set });
+  };
+
+  // create new functions with names derrived from the controller
+  let scope = Object.entries(controller).reduce((out, [key, fn]) => {
+    // Each derrived function returns a new function that expects the scope to bind to.
+    out[key] = (...args) => ctx => fn.call(ctx, ...args);
     return out;
   }, {});
-}, { error });
+
+  let apiArg = Object.assign(api, api(), {
+    // A function to change the base route for this instance of `api`
+    path(route) {
+      base = path.join('/', root, route);
+    },
+  });
+
+  let optionsArg = Object.assign({}, options, {
+    root,
+    onError,
+    beforeEach,
+    noRes: { resType: false },
+  });
+
+  controller.routes.call(scope, apiArg, optionsArg);
+};

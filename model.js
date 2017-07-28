@@ -32,7 +32,7 @@ module.exports = db => class Model {
     return Object.assign(obj, { _id, created });
   }
 
-  static async createTable() {
+  static async init() {
     await db.query(`
       create table if not exists ${this.config().table} (
         id text primary key not null,
@@ -82,6 +82,9 @@ module.exports = db => class Model {
   }
 
   static async read(id) {
+    if (!isString(id)) {
+      id = id._id;
+    }
     let result = await db.query(`
       select ${JSONB}
       from ${this.config().table}
@@ -101,6 +104,10 @@ module.exports = db => class Model {
       where id = $1;
     `, [this._id, JSON.stringify(this)]);
     return this;
+  }
+  static async update(obj) {
+    let instance = this.read(obj);
+    return instance.update(obj);
   }
 
   static async delete(id) {
