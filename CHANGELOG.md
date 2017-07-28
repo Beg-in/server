@@ -1,10 +1,11 @@
-<a name="0.2.2"></a>
-## [0.2.2](https://github.com/Beg-in/server/compare/0.2.1...0.2.2) (2017-06-28)
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/Beg-in/server/compare/0.2.2...0.3.0) (2017-07-28)
 
 
 ### Features
 
 * **model:** add empty ORM helper to query ([c85f2a0](https://github.com/Beg-in/server/commit/c85f2a0))
+* **route:** new routing system using controllers routes function ([b413186](https://github.com/Beg-in/server/commit/b413186))
 
 
 
