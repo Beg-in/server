@@ -1,3 +1,13 @@
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/Beg-in/server/compare/0.3.0...0.3.1) (2017-08-03)
+
+
+### Bug Fixes
+
+* **model:** fix update bug where promise was not awaited ([a7eb5dd](https://github.com/Beg-in/server/commit/a7eb5dd))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/Beg-in/server/compare/0.2.2...0.3.0) (2017-07-28)
 
