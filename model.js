@@ -106,7 +106,7 @@ module.exports = db => class Model {
     return this;
   }
   static async update(obj) {
-    let instance = this.read(obj);
+    let instance = await this.read(obj);
     return instance.update(obj);
   }
 
