@@ -23,13 +23,23 @@ module.exports = db => class Model {
   }
 
   static validate(obj) {
+    let keys = Object.keys(obj);
     let { _id } = obj;
     let { created, validate } = this.config();
     created = (created && obj.created) || created || undefined;
     if (isFunction(validate)) {
       obj = validate(obj);
     }
-    return Object.assign(obj, { _id, created });
+    // `_id` and `created` must be explicitly set only if the input contains them
+    // do not use `Object.assign`
+    // undefined values will overwrite a valid populated model property during assignment
+    if (keys.includes('_id')) {
+      obj._id = _id;
+    }
+    if (keys.includes('created')) {
+      obj.created = created;
+    }
+    return obj;
   }
 
   static async init() {
