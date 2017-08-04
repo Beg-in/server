@@ -1,6 +1,6 @@
 {
   "name": "begin-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Node.js server-side organizational pattern",
   "engines": {
     "node": ">=7.6"

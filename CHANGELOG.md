@@ -1,3 +1,13 @@
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/Beg-in/server/compare/0.3.1...0.3.2) (2017-08-04)
+
+
+### Bug Fixes
+
+* **model:** undefined properties do not override existing properties on update ([5f6c931](https://github.com/Beg-in/server/commit/5f6c931))
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/Beg-in/server/compare/0.3.0...0.3.1) (2017-08-03)
 
