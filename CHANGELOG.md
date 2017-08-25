@@ -1,3 +1,13 @@
+<a name="0.3.3"></a>
+## [0.3.3](https://github.com/Beg-in/server/compare/0.3.2...0.3.3) (2017-08-25)
+
+
+### Bug Fixes
+
+* **model:** created no longer erased from validate and update merge for validation ([1cce96f](https://github.com/Beg-in/server/commit/1cce96f))
+
+
+
 <a name="0.3.2"></a>
 ## [0.3.2](https://github.com/Beg-in/server/compare/0.3.1...0.3.2) (2017-08-04)
 
