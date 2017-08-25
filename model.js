@@ -26,6 +26,7 @@ module.exports = db => class Model {
     let keys = Object.keys(obj);
     let { _id } = obj;
     let { created, validate } = this.config();
+    let useCreated = created && !(keys.includes('created') && !obj.created);
     created = (created && obj.created) || created || undefined;
     if (isFunction(validate)) {
       obj = validate(obj);
@@ -36,7 +37,7 @@ module.exports = db => class Model {
     if (keys.includes('_id')) {
       obj._id = _id;
     }
-    if (keys.includes('created')) {
+    if (useCreated) {
       obj.created = created;
     }
     return obj;
@@ -107,7 +108,8 @@ module.exports = db => class Model {
   }
 
   async update(obj) {
-    Object.assign(this, this.constructor.validate(obj));
+    obj = this.constructor.validate(Object.assign({}, this, obj));
+    Object.assign(this, obj);
     await db.query(`
       update ${this.constructor.config().table}
       set data = $2::jsonb - '_id'
