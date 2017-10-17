@@ -7,12 +7,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore --format=node_modules/eslint-formatter-pretty ./",
-    "test:watch": "ava -w test/**/*.js",
-    "test:tap": "ava --tap test/**/*.js",
-    "cz": "git-cz",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "docs": "jsdoc2md --template docs.hbs --files *.js > README.md"
+    "b": "CONTEXT=$(pwd) npm explore begin-project -- npm run"
   },
   "repository": "Beg-in/server",
   "author": "beg.in <info@beg.in> (beg.in)",
@@ -25,23 +20,14 @@
   },
   "homepage": "https://github.com/Beg-in/server#readme",
   "devDependencies": {
-    "ava": "^0.19.1",
-    "begin-linting": "^0.1.0",
-    "commitizen": "^2.9.6",
-    "conventional-changelog-cli": "^1.3.1",
-    "cz-conventional-changelog": "^2.0.0",
-    "eslint": "^3.19.0",
-    "eslint-formatter-pretty": "^1.1.0",
-    "jsdoc-to-markdown": "^3.0.0"
+    "begin-project": "0.1.1"
   },
   "peerDependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "pg": "^6.2.3"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
+  "dependencies": {
+    "begin-util": "1.0.0"
   }
 }

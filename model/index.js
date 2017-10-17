@@ -1,8 +1,8 @@
 'use strict';
 
 let crypto = require('crypto');
-let error = require('./error');
-let { isFunction, isString } = require('./util');
+let error = require('begin-util/error');
+let { isFunction, isString } = require('begin-util');
 
 const ID_SIZE = 12;
 const MAX_RETRIES = 5;
@@ -133,7 +133,7 @@ module.exports = db => class Model {
   }
 
   safe(override = []) {
-    let protect = this.constructor.config().protect;
+    let { protect } = this.constructor.config();
     if (!Array.isArray(protect)) {
       return this;
     }

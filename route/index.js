@@ -1,8 +1,8 @@
 'use strict';
 
 let path = require('path');
-let error = require('./error');
-let { isFunction, isString } = require('./util');
+let error = require('begin-util/error');
+let { isFunction, isString } = require('begin-util');
 
 const METHODS = ['get', 'post', 'put', 'delete'];
 
