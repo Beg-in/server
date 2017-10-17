@@ -1,3 +1,8 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/Beg-in/server/compare/0.3.3...0.4.0) (2017-10-17)
+
+
+
 <a name="0.3.3"></a>
 ## [0.3.3](https://github.com/Beg-in/server/compare/0.3.2...0.3.3) (2017-08-25)
 
