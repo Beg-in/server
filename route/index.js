@@ -13,7 +13,7 @@ module.exports = (app, options = {}) => controller => {
   let {
     root = '',
     onError = console.error,
-    beforeEach = () => {},
+    beforeEach = () => () => {},
   } = options;
   let base = root;
   // Proxy methods in `app` with functions that take `(endpoint, callback)`

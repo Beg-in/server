@@ -20,14 +20,18 @@
   },
   "homepage": "https://github.com/Beg-in/server#readme",
   "devDependencies": {
-    "begin-project": "0.1.1"
-  },
-  "peerDependencies": {
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
-    "pg": "^6.2.3"
+    "begin-project": "^0.1.1"
   },
   "dependencies": {
-    "begin-util": "1.0.0"
+    "begin-util": "^1.0.0",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "express": "^4.16.2",
+    "helmet": "^3.9.0",
+    "ioredis": "^3.2.1",
+    "node-yaml": "3.1.1",
+    "pg": "^7.4.0",
+    "pretty-error": "^2.1.1",
+    "winston": "^2.4.0"
   }
 }
