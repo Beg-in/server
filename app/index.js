@@ -3,10 +3,10 @@
 let bodyParser = require('body-parser');
 let compress = require('compression');
 let express = require('express');
-let props = require('../props');
+let properties = require('../properties');
 let cors = require('../cors');
 
-const CORS = props.cors() !== false;
+const CORS = properties.app.cors() !== false;
 const app = express();
 
 app.disable('x-powered-by');

@@ -4,7 +4,7 @@
  * ## License
  * [The MIT License (MIT)](http://www.opensource.org/licenses/mit-license.html)
  *
- * Copyright (c) 2017 Beg.in
+ * Copyright (c) 2018 Begin, LLC
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,26 +27,20 @@
  * @module license
  */
 
-/* eslint-disable security/detect-non-literal-fs-filename */
 let fs = require('fs');
 let path = require('path');
 let helmet = require('helmet');
 let app = require('./app');
 let route = require('./route');
-let props = require('./props');
+let properties = require('./properties');
 let resolve = require('./resolve');
 require('./log');
 
-const HELMET = props.helmet() !== false;
-const root = props.route.root('v1');
-const PORT = props.port(8081);
-const LISTEN_IP = props.listen.ip();
-const CWD = props.cwd();
-const DIR = CWD
-  ? path.join(process.cwd(), CWD)
-  : ['server', 'src/server', 'src']
-    .map(dir => path.join(process.cwd(), dir))
-    .find(dir => fs.existsSync(dir));
+const HELMET = properties.app.helmet() !== false;
+const root = properties.route.root('v1');
+const PORT = properties.port(8081);
+const IP = properties.listen.ip();
+const CWD = properties.cwd();
 
 module.exports = options => {
   if (HELMET) {
@@ -58,8 +52,8 @@ module.exports = options => {
     ...options,
   });
   try {
-    fs.readdirSync(DIR).forEach(entry => {
-      entry = path.join(DIR, entry);
+    fs.readdirSync(CWD).forEach(entry => {
+      entry = path.join(CWD, entry);
       if (fs.statSync(entry).isDirectory()) {
         api(resolve(entry));
       }
@@ -68,6 +62,6 @@ module.exports = options => {
     console.error(e, '[begin-server] (FATAL) ERROR WHILE LOADING APP');
     process.exit(1);
   }
-  app.listen(PORT, LISTEN_IP);
+  app.listen(PORT, IP);
   console.info(`[begin-server] http started on port ${PORT}`);
 };

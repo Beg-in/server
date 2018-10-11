@@ -1,0 +1,14 @@
+doctype html
+html(lang="en")
+  head
+    meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
+    block meta
+    title
+      block title
+        | Notification from #{properties.name}
+  body
+    block greeting
+      p Hello,
+    block content
+    block footer
+      p If you believe this message has been sent to you in error or you are experiencing any issues please contact support at #[a(href=`mailto:${mail.support}`) #{properties.mail.support}].

@@ -2,15 +2,28 @@
 
 let error = require('begin-util/error');
 let Redis = require('ioredis');
-let props = require('../props');
+let properties = require('../properties');
 let Model = require('../model');
 
-const EXP = props.cache.expires(86400);
+const EXP = properties.cache.expires(86400);
 
 let client = new Redis({
-  host: props.cache.url(),
+  host: properties.cache.url(),
 });
 client.on('error', err => console.error(err));
+
+async function get(...args) {
+  let result = await client.get(...args);
+  if (result === null || result === undefined) {
+    throw error.notFound();
+  }
+  return JSON.parse(result);
+}
+
+async function set(key, val) {
+  return client.setex(key, EXP, JSON.stringify(val));
+  // TODO check promise return value here
+}
 
 module.exports = (T = Model) => class CacheModel extends T {
   static config() {
@@ -18,16 +31,11 @@ module.exports = (T = Model) => class CacheModel extends T {
   }
 
   static async get(...args) {
-    let result = await client.get(...args);
-    if (result === null || result === undefined) {
-      throw error.notFound();
-    }
-    return JSON.parse(result);
+    return get(...args);
   }
 
-  static async set(key, val) {
-    return client.setex(key, EXP, JSON.stringify(val));
-    // TODO check promise return value here
+  static async set(...args) {
+    return set(...args);
   }
 
   static async del(...args) {
@@ -37,6 +45,7 @@ module.exports = (T = Model) => class CacheModel extends T {
   static cacheName(id) {
     return `${this.config().table.toLowerCase()}_${id}`;
   }
+
   cacheName() {
     return this.constructor.cacheName(this._id);
   }
@@ -72,3 +81,5 @@ module.exports = (T = Model) => class CacheModel extends T {
     return client.multi(...args);
   }
 };
+
+Object.assign(module.exports, { get, set, client });

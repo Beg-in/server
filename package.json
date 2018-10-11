@@ -1,7 +1,7 @@
 {
   "name": "begin-server",
-  "version": "0.4.0",
-  "description": "Node.js server-side organizational pattern",
+  "version": "1.0.0-beta.1",
+  "description": "Node.js server-side organizational framework",
   "engines": {
     "node": ">=7.6"
   },
@@ -20,18 +20,24 @@
   },
   "homepage": "https://github.com/Beg-in/server#readme",
   "devDependencies": {
-    "begin-project": "^0.1.1"
+    "begin-project": "^0.4.2"
   },
   "dependencies": {
-    "begin-util": "^1.0.0",
+    "aws-sdk": "^2.332.0",
+    "begin-util": "^1.5.0",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
-    "express": "^4.16.2",
-    "helmet": "^3.9.0",
-    "ioredis": "^3.2.1",
+    "express": "^4.16.4",
+    "helmet": "^3.14.0",
+    "ioredis": "^4.0.2",
+    "jsonwebtoken": "^8.3.0",
     "node-yaml": "3.1.1",
+    "nodemailer": "^4.6.8",
+    "nodemailer-ses-transport": "^1.5.1",
     "pg": "^7.4.0",
     "pretty-error": "^2.1.1",
-    "winston": "^2.4.0"
+    "pug": "^2.0.3",
+    "secure-password": "^3.1.0",
+    "winston": "^3.1.0"
   }
 }

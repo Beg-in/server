@@ -1,11 +1,21 @@
 'use strict';
 
-module.exports = dependency => {
+let log = require('../log');
+
+const MESSAGE = 'could not resolve';
+const WARN = `[begin-server] ${MESSAGE}`;
+const ERROR = `[begin-server] (FATAL) ${MESSAGE.toUpperCase()}`;
+
+module.exports = (dependency, error = true) => {
   try {
     return require.main.require(dependency);
   } catch (e) {
     if (e.message.includes('Cannot find module')) {
-      console.error(`[begin-server] (FATAL) COULD NOT RESOLVE "${dependency}"`);
+      if (error) {
+        log.error(`${ERROR} "${dependency}"`);
+      } else {
+        log.warn(`${WARN} "${dependency}"`);
+      }
     }
     throw e;
   }

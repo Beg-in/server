@@ -1,10 +1,9 @@
 'use strict';
 
-let crypto = require('crypto');
 let error = require('begin-util/error');
 let { isFunction, isString } = require('begin-util');
+let { randomId } = require('../util');
 
-const ID_SIZE = 12;
 const MAX_RETRIES = 5;
 const JSONB = 'data || jsonb_build_object(\'_id\', id) as data';
 const UNIQUE_VIOLATION = '23505';
@@ -54,11 +53,7 @@ module.exports = db => class Model {
   }
 
   static genId() {
-    return crypto
-      .randomBytes(ID_SIZE)
-      .toString('base64')
-      .replace(/\//g, '_')
-      .replace(/\+/g, '-');
+    return randomId();
   }
 
   async create() {
@@ -88,6 +83,7 @@ module.exports = db => class Model {
     }
     return this;
   }
+
   static async create(...args) {
     return new this(...args).create();
   }
@@ -117,6 +113,7 @@ module.exports = db => class Model {
     `, [this._id, JSON.stringify(this)]);
     return this;
   }
+
   static async update(obj) {
     let instance = await this.read(obj);
     return instance.update(obj);
@@ -128,6 +125,7 @@ module.exports = db => class Model {
       where id = $1;
     `, [id]);
   }
+
   async delete() {
     return this.constructor.delete(this._id);
   }
