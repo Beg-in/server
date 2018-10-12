@@ -1,7 +1,5 @@
 'use strict';
 
-let log = require('../log');
-
 const MESSAGE = 'could not resolve';
 const WARN = `[begin-server] ${MESSAGE}`;
 const ERROR = `[begin-server] (FATAL) ${MESSAGE.toUpperCase()}`;
@@ -12,9 +10,9 @@ module.exports = (dependency, error = true) => {
   } catch (e) {
     if (e.message.includes('Cannot find module')) {
       if (error) {
-        log.error(`${ERROR} "${dependency}"`);
+        console.error(`${ERROR} "${dependency}"`);
       } else {
-        log.warn(`${WARN} "${dependency}"`);
+        console.warn(`${WARN} "${dependency}"`);
       }
     }
     throw e;

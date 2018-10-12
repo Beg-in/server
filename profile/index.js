@@ -25,18 +25,17 @@ module.exports = (Profile = BaseProfile, {
   let CacheProfile = cache(Profile);
 
   return {
-    routes(api, { open = -1 } = {}) {
+    routes(api, { $open, $root }) {
       api.path('profile');
-      api(open).post('email', ({ body }) => this.verifyEmail(body.verify));
-      api(open).post(({ body }) => this.create(body));
+      api($open).post('email', ({ body }) => this.verifyEmail(body.verify));
+      api($open).post(({ body }) => this.create(body));
       api.get(() => this.sendCurrentProfile());
       api.put('email', ({ body }) => this.changeEmail(body));
-      api.put('name', ({ body }) => this.changeName(body));
-      api(open).put('login', ({ body }) => this.login(body));
-      api(open).put('logout', ({ body }) => this.logout(body));
-      api(open).get('reset/:email', ({ params }) => this.resetPassword(params.email));
-      api(open).put('reset', ({ body }) => this.verifyResetPassword(body));
-      api(0).put('role/:id/:role', ({ params }) => this.setRole(params.id, params.role));
+      api($open).put('login', ({ body }) => this.login(body));
+      api($open).put('logout', ({ body }) => this.logout(body));
+      api($open).get('reset/:email', ({ params }) => this.resetPassword(params.email));
+      api($open).put('reset', ({ body }) => this.verifyResetPassword(body));
+      api($root).put('role/:id/:role', ({ params }) => this.setRole(params.id, params.role));
     },
 
     async sendVerification(to) {
@@ -52,13 +51,18 @@ module.exports = (Profile = BaseProfile, {
       });
     },
 
-    async create({ phone, email, key, firstName, lastName }) {
+    async validateNewProfile({ email, key, firstName, lastName }) {
       email = email.toLowerCase();
       validate.password(key);
       validate.email(email);
       await Profile.getByEmail(email.toLowerCase()).empty(error.conflict('Email address taken'));
-      await new Profile({ phone, firstName, lastName, email, verify: email }).create();
-      await this.sendVerification(email);
+      return new Profile({ firstName, lastName, email, verify: email });
+    },
+
+    async create(body) {
+      let profile = await this.baseCreate(body);
+      await profile.create();
+      await this.sendVerification(profile.email);
     },
 
     async read(id) {
@@ -114,13 +118,6 @@ module.exports = (Profile = BaseProfile, {
           subject: `${NAME} Email Change Notification`,
           to: profile.email,
         });
-      }
-    },
-
-    async changeName({ firstName, lastName }) {
-      let profile = await this.read();
-      if (firstName !== profile.firstName || lastName !== profile.lastName) {
-        await this.update(Object.assign(profile, { firstName, lastName }));
       }
     },
 
@@ -208,6 +205,12 @@ module.exports = (Profile = BaseProfile, {
       let decoded = await auth.decodeToken(verify, this, audience);
       let profile = await this.read(decoded.sub);
       profile.hash = await auth.hash(key);
+      await this.update(profile);
+    },
+
+    async setRole(id, role) {
+      let profile = await this.read(id);
+      profile.role = role;
       await this.update(profile);
     },
   };

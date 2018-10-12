@@ -8,7 +8,6 @@ let properties = require('../properties');
 let cache = require('../cache');
 let log = require('../log');
 
-const OPEN = properties.roles.open(-1);
 const DEV_KEY = 'LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IUUNBUUVFSU9laHorMCtNWngvczhZZG9KUWhJUzl0NUZlbnVzSmxQVyt5L0xRZmh4dE5vQWNHQlN1QkJBQUsKb1VRRFFnQUU1NE1vOVp3RjY1TjRqN2FraFRJc3lQN0Rqb3NoK0dxSDFoTmJ0eTN3bENpdHZER2dSM1FzQ2tvQgp6L09BVWkzelVxRHhBOUlOWHNWVC95VHBqUjg1WHc9PQotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0tCg==';
 const DEV_PUBLIC = 'LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUFvRFFnQUU1NE1vOVp3RjY1TjRqN2FraFRJc3lQN0Rqb3NoK0dxSAoxaE5idHkzd2xDaXR2REdnUjNRc0Nrb0J6L09BVWkzelVxRHhBOUlOWHNWVC95VHBqUjg1WHc9PQotLS0tLUVORCBQVUJMSUMgS0VZLS0tLS0K';
 const CSRF_HEADER = 'x-csrf-token';
@@ -18,6 +17,7 @@ const isDayAgo = ms => (new Date(Date.now() - DAY)).getTime() > (new Date(ms * 1
 const decodeB64 = b64 => Buffer.from(b64, 'base64');
 const ISSUER = properties.auth.issuer(properties.domain());
 const KEY = decodeB64(properties.auth.key(undefined, DEV_KEY));
+const $open = '$OPEN';
 const CONFIG = {
   public: decodeB64(properties.auth.public(undefined, DEV_PUBLIC)),
   algorithm: properties.auth.algorithm('ES512', 'ES256'),
@@ -103,47 +103,43 @@ function getToken(payload, options = {}) {
   return jwt.sign(payload, KEY, options);
 }
 
+async function test(ctx, authorize = () => {}) {
+  let token = ctx.req.headers.authorization;
+  if (!token) {
+    throw error.unauthorized('No authorization header present');
+  }
+  if (token.toLowerCase().indexOf('bearer ') !== 0) {
+    throw INVALID('Incorrect authorization protocol', ctx);
+  }
+  token = token.substring(7);
+  let decoded = await decodeToken(token, ctx, CONFIG.audience);
+  let csrf = ctx.req.get(CSRF_HEADER);
+  if (csrf !== decoded.csrf) {
+    throw INVALID('No CSRF present', ctx);
+  }
+  if (isDayAgo(decoded.iat)) {
+    ctx.res.append(REFRESH_HEADER, true);
+  }
+  authorize(decoded);
+  let cached;
+  try {
+    cached = await cache.get(`access_${decoded._id}`);
+  } catch (e) {
+    // this block intentionally empty
+  }
+  if (!cached || cached !== decoded.sub) {
+    throw INVALID('Revoked access token', ctx);
+  }
+  ctx.res.locals.access = decoded;
+}
+
 module.exports = {
   CSRF_HEADER,
   REFRESH_HEADER,
   CONFIG,
   INVALID,
   verifyHash,
-
-  async test(ctx, role) {
-    if (role === OPEN) {
-      return;
-    }
-    let token = ctx.req.headers.authorization;
-    if (!token) {
-      throw error.unauthorized('No authorization header present');
-    }
-    if (token.toLowerCase().indexOf('bearer ') !== 0) {
-      throw INVALID('Incorrect authorization protocol', ctx);
-    }
-    token = token.substring(7);
-    let decoded = await decodeToken(token, ctx, CONFIG.audience);
-    let csrf = ctx.req.get(CSRF_HEADER);
-    if (csrf !== decoded.csrf) {
-      throw INVALID('No CSRF present', ctx);
-    }
-    if (isDayAgo(decoded.iat)) {
-      ctx.res.append(REFRESH_HEADER, true);
-    }
-    if (role && decoded.role !== 0 && (!decoded.role || role < decoded.role)) {
-      throw error.forbidden('You are not authorized to access this resource');
-    }
-    let cached;
-    try {
-      cached = await cache.get(`access_${decoded._id}`);
-    } catch (e) {
-      // this block intentionally empty
-    }
-    if (!cached || cached !== decoded.sub) {
-      throw INVALID('Revoked access token', ctx);
-    }
-    ctx.res.locals.access = decoded;
-  },
+  test,
 
   async access(ctx, config) {
     let { sub } = config;
@@ -175,6 +171,21 @@ module.exports = {
     } = options;
     options = Object.assign(options, { algorithms, audience });
     jwt.verify(token, CONFIG.public, options);
+  },
+
+  roleAuthorizer(roles) {
+    let authorizer = async (ctx, check) => {
+      if (check === $open) {
+        return;
+      }
+      await test(ctx, decoded => {
+        if (!check(decoded.role)) {
+          throw error.forbidden('You are not authorized to access this resource');
+        }
+      });
+    };
+    authorizer.helpers = Object.assign({ $open }, roles.$helpers);
+    return authorizer;
   },
 };
 

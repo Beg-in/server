@@ -1,8 +1,7 @@
 'use strict';
 
-/**
- * ## License
- * [The MIT License (MIT)](http://www.opensource.org/licenses/mit-license.html)
+/*
+ * The MIT License (MIT) http://www.opensource.org/licenses/mit-license.html
  *
  * Copyright (c) 2018 Begin, LLC
  *
@@ -23,45 +22,46 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
- * @module license
  */
 
 let fs = require('fs');
 let path = require('path');
-let helmet = require('helmet');
+let log = require('./log');
 let app = require('./app');
 let route = require('./route');
 let properties = require('./properties');
 let resolve = require('./resolve');
-require('./log');
 
-const HELMET = properties.app.helmet() !== false;
-const root = properties.route.root('v1');
 const PORT = properties.port(8081);
 const IP = properties.listen.ip();
 const CWD = properties.cwd();
 
-module.exports = options => {
-  if (HELMET) {
-    app.use(helmet());
-    app.use(helmet.noCache());
-  }
-  let api = route(app, {
-    root,
-    ...options,
-  });
-  try {
-    fs.readdirSync(CWD).forEach(entry => {
-      entry = path.join(CWD, entry);
-      if (fs.statSync(entry).isDirectory()) {
-        api(resolve(entry));
+module.exports = {
+  loadComponents(components) {
+    if (!components) {
+      components = [];
+      try {
+        for (let entry of fs.readdirSync(CWD)) {
+          let source = path.join(CWD, entry);
+          if (fs.statSync(source).isDirectory()) {
+            try {
+              components.push(resolve(source));
+            } catch (e) {
+              log.error(e, `[begin-server] (FATAL) ERROR READING SOURCE "${source}"`);
+              process.exit(2);
+            }
+          }
+        }
+      } catch (e) {
+        log.error(e, `[begin-server] (FATAL) ERROR READING SOURCE DIRECTORY "${CWD}"`);
+        process.exit(1);
       }
-    });
-  } catch (e) {
-    console.error(e, '[begin-server] (FATAL) ERROR WHILE LOADING APP');
-    process.exit(1);
-  }
-  app.listen(PORT, IP);
-  console.info(`[begin-server] http started on port ${PORT}`);
+    }
+    components.forEach(route.register);
+  },
+
+  listen() {
+    app.listen(PORT, IP);
+    log.info(`[begin-server] http started on port ${PORT}`);
+  },
 };

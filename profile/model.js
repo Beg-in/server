@@ -53,11 +53,4 @@ module.exports = class Profile extends Model {
       'email',
     ];
   }
-
-  static get ROLES() {
-    return {
-      super: 0,
-      admin: 1,
-    };
-  }
 };

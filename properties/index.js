@@ -28,7 +28,7 @@ let production = properties.production || {};
 let config = STAGE === 'production' ? production : assignDeep(production, properties[STAGE] || {});
 let { build } = config;
 config = assignDeep(config.public || {}, config.server || {});
-const cwd = config.cwd() ? path.join(process.cwd(), config.cwd()) : DIRECTORIES
+const cwd = config.cwd ? path.join(process.cwd(), config.cwd()) : DIRECTORIES
   .map(dir => path.join(process.cwd(), dir))
   .find(dir => fs.existsSync(dir));
 config = Object.assign({}, config, { isDevelopment, name, domain, build, cwd });
