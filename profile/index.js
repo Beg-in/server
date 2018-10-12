@@ -142,6 +142,10 @@ module.exports = (Profile = BaseProfile, {
     },
 
     async login({ email, key }) {
+      if (!email || !key) {
+        throw error('Missing email or password');
+      }
+      await validate.email(email);
       let profile = await Profile
         .getByEmail(email.toLowerCase().trim())
         .required(error('Incorrect username or password'))

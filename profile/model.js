@@ -13,9 +13,11 @@ module.exports = class Profile extends Model {
       role: validate.any,
       refresh: validate.any,
       verify: validate.any,
+      hash: validate.any,
     };
     config.validate = validate(config.rules);
     config.protect = [
+      'hash',
       'lastName',
       'email',
       'verify',

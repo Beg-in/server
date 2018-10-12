@@ -2,7 +2,7 @@
 
 let error = require('begin-util/error');
 let jwt = require('jsonwebtoken');
-let password = require('secure-password');
+let securePassword = require('secure-password');
 let { randomId } = require('../util');
 let properties = require('../properties');
 let cache = require('../cache');
@@ -18,6 +18,7 @@ const decodeB64 = b64 => Buffer.from(b64, 'base64');
 const ISSUER = properties.auth.issuer(properties.domain());
 const KEY = decodeB64(properties.auth.key(undefined, DEV_KEY));
 const $open = '$OPEN';
+const password = securePassword();
 const CONFIG = {
   public: decodeB64(properties.auth.public(undefined, DEV_PUBLIC)),
   algorithm: properties.auth.algorithm('ES512', 'ES256'),
@@ -39,21 +40,21 @@ function INVALID(msg, ctx, err) {
 }
 
 async function hash(secret) {
-  let buffer = await password.hash(secret);
+  let result = await password.hash(Buffer.from(secret));
   // Save hash somewhere
-  return buffer.toString('base64');
+  return result.toString('base64');
 }
 
 async function verifyHash(kdf, secret, improve) {
-  let buffer = decodeB64(kdf);
-  let result = await password.verify(secret, buffer);
+  let buffer = Buffer.from(secret);
+  let result = await password.verify(buffer, decodeB64(kdf));
   switch (result) {
-    case password.INVALID:
+    case securePassword.INVALID:
       throw error('Incorrect username or password');
-    case password.VALID_NEEDS_REHASH:
+    case securePassword.VALID_NEEDS_REHASH:
       if (improve) {
         try {
-          const improvedKdf = await hash(secret);
+          const improvedKdf = await hash(buffer);
           // Save improvedHash somewhere
           return improve(improvedKdf);
         } catch (e) {
@@ -62,10 +63,10 @@ async function verifyHash(kdf, secret, improve) {
         }
       }
       return true;
-    case password.VALID:
+    case securePassword.VALID:
       return true;
     default:
-      log.error(format(`error verifying hash ${result}`));
+      log.error(format(`error verifying hash, status: ${result.toString()}`));
       throw error.serverError();
   }
 }
@@ -97,7 +98,7 @@ function getToken(payload, options = {}) {
     algorithm = CONFIG.algorithm,
     expiresIn = CONFIG.expiresIn,
     issuer = CONFIG.issuer,
-    jwtid = CONFIG.version,
+    jwtid = CONFIG.jwtid,
     audience = CONFIG.audience,
   } = options;
   if (expiresIn === false) {
@@ -142,6 +143,7 @@ module.exports = {
   REFRESH_HEADER,
   CONFIG,
   INVALID,
+  hash,
   verifyHash,
   test,
 
