@@ -61,4 +61,3 @@ if (properties.log() !== false) {
 // process.on('unhandledRejection', console.error);
 
 module.exports = console;
-module.exports.error(new Error('test error message'));

@@ -101,7 +101,7 @@ module.exports = {
     if (isFunction(fn)) {
       authorizer = fn;
     } else {
-      log.error('Invalid authorizer registration', fn);
+      log.error('[begin-server] Invalid authorizer registration', fn);
     }
   },
 
@@ -109,7 +109,7 @@ module.exports = {
     if (isFunction(fn)) {
       errorHandler = fn;
     } else {
-      log.error('Invalid error handler registration', fn);
+      log.error('[begin-server] Invalid error handler registration', fn);
     }
   },
 };

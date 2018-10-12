@@ -27,8 +27,11 @@ const CONFIG = {
   issuer: ISSUER,
 };
 
+function format(msg) {
+  return `[auth] ${msg}`;
+}
 function INVALID(msg, ctx, err) {
-  msg = `[auth] ${msg}`;
+  msg = format(msg);
   msg += err ? ` ${err.message}` : '';
   msg += ctx ? ` from ${ctx.req.ip}` : '';
   log.warn(msg);
@@ -53,15 +56,16 @@ async function verifyHash(kdf, secret, improve) {
           const improvedKdf = await hash(secret);
           // Save improvedHash somewhere
           return improve(improvedKdf);
-        } catch (err) {
-          log.warn('error updating hash');
+        } catch (e) {
+          log.error(format('error updating hash'));
+          log.error(e);
         }
       }
       return true;
     case password.VALID:
       return true;
     default:
-      log.error(`error verifying hash ${result}`);
+      log.error(format(`error verifying hash ${result}`));
       throw error.serverError();
   }
 }

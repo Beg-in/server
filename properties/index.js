@@ -18,7 +18,7 @@ try {
   properties = {};
 }
 const { name } = pkg;
-const domain = (
+const domain = process.env.SERVER_DOMAIN || (
   properties.production
   && properties.production.build
   && properties.production.build.domain
@@ -31,10 +31,14 @@ config = assignDeep(config.public || {}, config.server || {});
 const cwd = config.cwd ? path.join(process.cwd(), config.cwd()) : DIRECTORIES
   .map(dir => path.join(process.cwd(), dir))
   .find(dir => fs.existsSync(dir));
-config = Object.assign({}, config, { isDevelopment, name, domain, build, cwd });
-
+let api = { isDevelopment, name, domain, build, cwd };
+config = Object.assign({}, config, api);
+let apiKeys = Object.keys(api);
 let props = location => new Proxy((fallback, devFallback) => {
   let subLocation = location.substring(1);
+  if (apiKeys.includes(subLocation)) {
+    return api[subLocation];
+  }
   let env = process.env[subLocation.toUpperCase()];
   if (!env) {
     let obj = config;
