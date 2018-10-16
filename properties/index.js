@@ -36,7 +36,7 @@ config = Object.assign({}, config, api);
 let apiKeys = Object.keys(api);
 let props = location => new Proxy((fallback, devFallback) => {
   let subLocation = location.substring(1);
-  if (apiKeys.includes(subLocation)) {
+  if (!subLocation.includes('_') && apiKeys.includes(subLocation)) {
     return api[subLocation];
   }
   let env = process.env[subLocation.toUpperCase()];
