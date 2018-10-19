@@ -1,4 +1,4 @@
 extends ../mail/template
 
 block content
-  p Please verify your email address by #[a(href=`https://${properties.domain}/?verify=${verify}`) clicking here].
+  p Please verify your email address by #[a(href=`${properties.build.root()}/?verify=${verify}`) clicking here].

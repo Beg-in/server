@@ -2,15 +2,16 @@
 
 let path = require('path');
 let pug = require('pug');
-let rawProperties = require('../properties');
+let properties = require('../properties');
 
 const MODULES = path.join(process.cwd(), 'node_modules');
-const properties = rawProperties();
 
-let compiled = {};
-module.exports = (file, { baseDir = MODULES, globals = { properties } } = {}) => {
-  if (!compiled[file]) {
-    compiled[file] = pug.compileFile(file, { baseDir, globals });
-  }
-  return compiled[file];
+module.exports = (filename, locals = {}) => {
+  let { baseDir = MODULES } = locals;
+  let compiled = pug.compileFile(filename, {
+    baseDir,
+    filename,
+    cache: true,
+  });
+  return compiled(Object.assign({ properties }, locals));
 };

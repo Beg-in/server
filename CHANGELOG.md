@@ -1,3 +1,35 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/Beg-in/server/compare/1.0.0-beta.4...1.0.0) (2018-10-19)
+
+
+### Bug Fixes
+
+* **mail:** mail prints to console in development ([4e35d36](https://github.com/Beg-in/server/commit/4e35d36))
+
+
+
+<a name="1.0.0-beta.4"></a>
+# [1.0.0-beta.4](https://github.com/Beg-in/server/compare/1.0.0-beta.1...1.0.0-beta.4) (2018-10-16)
+
+
+### Bug Fixes
+
+* **auth:** buffers for secure-password ([c9a9e75](https://github.com/Beg-in/server/commit/c9a9e75))
+* **db:** bump version for production properties fix ([75a3746](https://github.com/Beg-in/server/commit/75a3746))
+* **properties:** internal api overrides environment variables ([cd1a230](https://github.com/Beg-in/server/commit/cd1a230))
+
+
+### Features
+
+* **roles:** add role system ([da312f0](https://github.com/Beg-in/server/commit/da312f0))
+
+
+
+<a name="1.0.0-beta.1"></a>
+# [1.0.0-beta.1](https://github.com/Beg-in/server/compare/0.4.0...1.0.0-beta.1) (2018-10-11)
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/Beg-in/server/compare/0.3.3...0.4.0) (2017-10-17)
 
@@ -45,17 +77,12 @@
 
 
 <a name="0.2.1"></a>
-## [0.2.1](https://github.com/Beg-in/server/compare/0.2.0...0.2.1) (2017-06-16)
+## [0.2.1](https://github.com/Beg-in/server/compare/0.1.3...0.2.1) (2017-06-16)
 
 
 ### Bug Fixes
 
 * **route:** add error as route export ([be17064](https://github.com/Beg-in/server/commit/be17064))
-
-
-
-<a name="0.2.0"></a>
-# [0.2.0](https://github.com/Beg-in/server/compare/0.1.3...0.2.0) (2017-06-16)
 
 
 

@@ -146,6 +146,7 @@ module.exports = {
   hash,
   verifyHash,
   getToken,
+  decodeToken,
   test,
 
   async access(ctx, config) {
