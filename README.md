@@ -170,6 +170,7 @@ Controller Object:
 'use strict';
 
 let ProfileController = require('../profile');
+let MyModel = require('./model');
 
 module.exports = {
   routes(api, { $open, $admin, $root, manager }) {
@@ -269,7 +270,8 @@ Arguments:
  - (optional) req: `Object` - [request object from Express](https://expressjs.com/en/api.html#req)
  - (optional) res: `Object` - [response object from Express](https://expressjs.com/en/api.html#res)
 
-**helpers**
+**Helpers**
+
 Properties:
  - noRes: `Object` - object that can be passed to `api.set()` to disable the JSON response type
  - [(with `roleAuthorizer`) - role `$helpers` see below]

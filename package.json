@@ -1,6 +1,6 @@
 {
   "name": "begin-server",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0",
   "description": "Node.js server-side organizational framework",
   "engines": {
     "node": ">=7.6"
@@ -23,18 +23,18 @@
     "begin-project": "^0.4.2"
   },
   "dependencies": {
-    "aws-sdk": "^2.332.0",
-    "begin-util": "^1.5.0",
+    "aws-sdk": "^2.346.0",
+    "begin-util": "^1.5.1",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "express": "^4.16.4",
     "helmet": "^3.14.0",
-    "ioredis": "^4.0.2",
+    "ioredis": "^4.2.0",
     "jsonwebtoken": "^8.3.0",
     "node-yaml": "3.1.1",
     "nodemailer": "^4.6.8",
     "nodemailer-ses-transport": "^1.5.1",
-    "pg": "^7.4.0",
+    "pg": "^7.6.0",
     "pretty-error": "^2.1.1",
     "pug": "^2.0.3",
     "secure-password": "^3.1.0",

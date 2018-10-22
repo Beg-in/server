@@ -1,10 +1,15 @@
 <a name="1.0.0"></a>
-# [1.0.0](https://github.com/Beg-in/server/compare/1.0.0-beta.4...1.0.0) (2018-10-19)
+# [1.0.0](https://github.com/Beg-in/server/compare/1.0.0-beta.6...1.0.0) (2018-11-01)
+
+
+
+<a name="1.0.0-beta.6"></a>
+# [1.0.0-beta.6](https://github.com/Beg-in/server/compare/1.0.0-beta.4...1.0.0-beta.6) (2018-10-19)
 
 
 ### Bug Fixes
 
-* **mail:** mail prints to console in development ([4e35d36](https://github.com/Beg-in/server/commit/4e35d36))
+* **mail:** mail prints to console in development ([aa21e5a](https://github.com/Beg-in/server/commit/aa21e5a))
 
 
 

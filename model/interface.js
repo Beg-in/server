@@ -56,6 +56,13 @@ module.exports = db => class Model {
     return randomId();
   }
 
+  static async $createQuery(obj) {
+    return db.query(`
+      insert into ${this.config().table}
+      values($1, $2::jsonb - '_id');
+    `, [obj._id, JSON.stringify(obj)]);
+  }
+
   async create() {
     let newId = !this._id;
     Object.assign(this, this.constructor.validate(this));
@@ -66,10 +73,7 @@ module.exports = db => class Model {
         this._id = this.constructor.genId();
       }
       try {
-        await db.query(`
-          insert into ${this.constructor.config().table}
-          values($1, $2::jsonb - '_id');
-        `, [this._id, JSON.stringify(this)]);
+        await this.constructor.$createQuery(this);
         complete = true;
       } catch (e) {
         if (e.code !== UNIQUE_VIOLATION) {
@@ -88,29 +92,37 @@ module.exports = db => class Model {
     return new this(...args).create();
   }
 
-  static async read(id) {
-    if (!isString(id)) {
-      id = id._id;
-    }
-    let result = await db.query(`
+  static async $readQuery(id) {
+    return db.query(`
       select ${JSONB}
       from ${this.config().table}
       where id = $1;
     `, [id]);
+  }
+
+  static async read(id) {
+    if (!isString(id)) {
+      id = id._id;
+    }
+    let result = await this.$readQuery(id);
     if (result.rows.length !== 1) {
       throw error.fatal(`Unexpected row count: ${result.rows.length}`);
     }
     return new this(result.rows[0].data);
   }
 
+  static async $updateQuery(obj) {
+    return db.query(`
+      update ${this.config().table}
+      set data = $2::jsonb - '_id'
+      where id = $1;
+    `, [obj._id, JSON.stringify(obj)]);
+  }
+
   async update(obj) {
     obj = this.constructor.validate(Object.assign({}, this, obj));
     Object.assign(this, obj);
-    await db.query(`
-      update ${this.constructor.config().table}
-      set data = $2::jsonb - '_id'
-      where id = $1;
-    `, [this._id, JSON.stringify(this)]);
+    await this.constructor.$updateQuery(this);
     return this;
   }
 
