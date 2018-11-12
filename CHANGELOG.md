@@ -1,4 +1,14 @@
 <a name="1.0.0"></a>
+# [1.0.0](https://github.com/Beg-in/server/compare/1.0.0-beta.7...1.0.0) (2018-11-12)
+
+
+### Bug Fixes
+
+* **package:** include pm2 for production environments ([3de7324](https://github.com/Beg-in/server/commit/3de7324))
+
+
+
+<a name="1.0.0"></a>
 # [1.0.0](https://github.com/Beg-in/server/compare/1.0.0-beta.6...1.0.0) (2018-11-01)
 
 
