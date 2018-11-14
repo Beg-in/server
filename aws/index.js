@@ -2,6 +2,7 @@
 
 let sdk = require('aws-sdk');
 let properties = require('../properties');
+let log = require('../log');
 
 const S3_BUCKET = properties.aws.bucket(properties.domain());
 const SES_REGION = properties.aws.ses.region('us-east-1');
@@ -31,10 +32,17 @@ module.exports = {
           ACL: 'public-read',
         }, options)).replace(/\.s3\.amazonaws\.com/, '');
       },
-      getObjectStream(Key, options = {}) {
-        return s3.getObject(Object.assign({ Bucket, Key }, options)).createReadStream();
+      async getObjectStream(Key, options = {}) {
+        // console.log('get', Bucket, Key, options);
+        let req = s3.getObject(Object.assign({ Bucket, Key }, options), err => {
+          throw err;
+        });
+        let stream = req.createReadStream();
+        await req.promise();
+        return stream;
       },
       putObjectStream(Key, Body, options = {}) {
+        console.log('put', Bucket, Key, options);
         return s3.upload(Object.assign({ Bucket, Key, Body }, options)).promise();
       },
     });

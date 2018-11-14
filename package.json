@@ -1,6 +1,6 @@
 {
   "name": "begin-server",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "description": "Node.js server-side organizational framework",
   "engines": {
     "node": ">=7.6"
@@ -23,7 +23,7 @@
     "begin-project": "^0.4.2"
   },
   "dependencies": {
-    "aws-sdk": "^2.346.0",
+    "aws-sdk": "^2.355.0",
     "begin-util": "^1.5.1",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
