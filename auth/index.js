@@ -182,7 +182,7 @@ module.exports = {
   },
 
   roleAuthorizer(roles) {
-    let authorizer = async (ctx, check) => {
+    let authorizer = async (ctx, check = () => true) => {
       if (check === $open) {
         return;
       }
