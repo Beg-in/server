@@ -1,34 +1,11 @@
 'use strict';
 
 let util = require('util');
-let PrettyError = require('pretty-error');
 let { createLogger, format, transports } = require('winston');
 let properties = require('../properties');
-let { dependencies = {}, peerDependencies = {} } = require('../package');
 
-let pretty = new PrettyError();
-pretty.skipNodeFiles();
-pretty.skipPackage(...Object.keys(dependencies).concat(Object.keys(peerDependencies)));
-pretty.skip(traceLine => {
-  if (traceLine) {
-    if (`${traceLine.path}`.indexOf('internal/') === 0) {
-      return true;
-    }
-    if (traceLine.path === __filename) {
-      return true;
-    }
-  }
-  return false;
-});
-pretty.alias(process.cwd(), `(${properties.name()})`);
-pretty.appendStyle({
-  'pretty-error > header > title > kind': { display: 'none' },
-  'pretty-error > header > colon': { display: 'none' },
-});
 let transportFormat = format.simple();
-if (!properties.isDevelopment()) {
-  pretty.withoutColors();
-} else {
+if (properties.isDevelopment()) {
   transportFormat = format.combine(format.colorize(), format.simple());
 }
 let config = {
@@ -49,7 +26,12 @@ if (properties.log() !== false) {
       logger.warn(args.join(' '));
     },
     error(...args) {
-      args.forEach(arg => logger.error(pretty.render(arg)));
+      args.forEach(arg => {
+        logger.error(arg);
+        if (arg.stack) {
+          logger.error(arg.stack);
+        }
+      });
     },
     debug(...args) {
       args.forEach(arg => logger.debug(util.inspect(arg, { colors: true })));

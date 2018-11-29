@@ -33,7 +33,6 @@ module.exports = {
         }, options)).replace(/\.s3\.amazonaws\.com/, '');
       },
       async getObjectStream(Key, options = {}) {
-        // console.log('get', Bucket, Key, options);
         let req = s3.getObject(Object.assign({ Bucket, Key }, options), err => {
           throw err;
         });
@@ -42,7 +41,6 @@ module.exports = {
         return stream;
       },
       putObjectStream(Key, Body, options = {}) {
-        console.log('put', Bucket, Key, options);
         return s3.upload(Object.assign({ Bucket, Key, Body }, options)).promise();
       },
     });
