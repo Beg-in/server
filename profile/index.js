@@ -12,14 +12,14 @@ let auth = require('../auth');
 const NAME = properties.name();
 const VERIFY_EMAIL = require.resolve('./verify-email.pug');
 const NOTIFY_EMAIL = require.resolve('./notify-email.pug');
-const CHANGE_PASSWORD = require.resolve('./change-password.pug');
+const RESET_PASSWORD = require.resolve('./reset-password.pug');
 const NOTIFY_PASSWORD = require.resolve('./notify-password.pug');
 const audience = auth.audience('resetPassword');
 
 module.exports = (Profile = BaseProfile, {
   verifyEmail = VERIFY_EMAIL,
   notifyEmail = NOTIFY_EMAIL,
-  changePassword = CHANGE_PASSWORD,
+  resetPassword = RESET_PASSWORD,
   notifyPassword = NOTIFY_PASSWORD,
 } = {}) => {
   let CacheProfile = cache(Profile);
@@ -198,7 +198,7 @@ module.exports = (Profile = BaseProfile, {
         }
       }
       await mail({
-        template: changePassword,
+        template: resetPassword,
         subject: `${NAME} Password Change Request`,
         to: profile.email,
         reset: auth.getToken({ sub: profile._id }, { audience }),
